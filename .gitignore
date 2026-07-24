@@ -1,0 +1,23 @@
+# Secrets — never commit
+config/config.json
+*.env
+.env
+
+# Logs
+logs/*.log
+logs/*.csv
+!logs/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# PowerShell
+*.ps1.bak
+
+# OS / editor
+.DS_Store
+.vscode/
+*.swp
