@@ -1,0 +1,11 @@
+{
+  "tenantId": "YOUR_TENANT_ID",
+  "clientId": "YOUR_APP_REGISTRATION_CLIENT_ID",
+  "clientSecret": "YOUR_CLIENT_SECRET",
+  "graphBaseUrl": "https://graph.microsoft.com/v1.0",
+  "defaultGroups": {
+    "Engineering": ["GROUP_OBJECT_ID_ENGINEERING"],
+    "Sales": ["GROUP_OBJECT_ID_SALES"]
+  },
+  "logFilePath": "../logs/audit.log"
+}
