@@ -27,4 +27,7 @@ and when" from the log alone.
 - [ ] Error handling: retry policy for transient Graph API throttling (429s)?
 - [ ] Secrets: client secret in config.json works for a dev tenant demo — note
       in the README that production would use a certificate or managed identity + Key Vault.
-- [ ] Testing: consider a `--dry-run` flag that logs intended actions without calling Graph.
+- [x] Testing: `--dry-run` flag added to the Python scripts (2026-07-25) — `GraphClient.request()`
+      short-circuits and returns a synthetic response instead of calling Graph, so onboarding/
+      offboarding/group-sync logic can be exercised end-to-end with zero risk to a real tenant.
+      PowerShell parity is still open.
