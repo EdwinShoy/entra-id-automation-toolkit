@@ -42,12 +42,43 @@ def setup_logger(log_path: str) -> logging.Logger:
     return logger
 
 
+class DryRunResponse:
+    """Stand-in for requests.Response when GraphClient is in dry-run mode.
+
+    Echoes back the request body (with a synthetic 'id' if none was given)
+    so calling code that reads response.json()["id"] etc. keeps working
+    without ever hitting the network.
+    """
+
+    def __init__(self, method: str, endpoint: str, body: dict | None = None):
+        self.ok = True
+        self.status_code = 200
+        self._body = dict(body or {})
+        self._body.setdefault("id", "dryrun-id")
+        self.text = f"[DRY RUN] {method.upper()} {endpoint}"
+
+    def json(self) -> dict:
+        return self._body
+
+    def raise_for_status(self) -> None:
+        pass
+
+
 class GraphClient:
     """Thin authenticated wrapper around the Microsoft Graph REST API."""
 
-    def __init__(self, config: dict | None = None):
+    def __init__(self, config: dict | None = None, dry_run: bool = False):
         self.config = config or load_config()
-        self.logger = setup_logger(self.config.get("logFilePath", "../logs/audit.log"))
+
+        # logFilePath in config.json is relative to the config/ directory
+        # (e.g. "../logs/audit.log" -> <repo root>/logs/audit.log), not to
+        # whatever directory the script happens to be invoked from.
+        log_path = Path(self.config.get("logFilePath", "../logs/audit.log"))
+        if not log_path.is_absolute():
+            log_path = (CONFIG_PATH.parent / log_path).resolve()
+        self.logger = setup_logger(str(log_path))
+
+        self.dry_run = dry_run
         self._token = None
 
     def _get_token(self) -> str:
@@ -74,6 +105,10 @@ class GraphClient:
 
         endpoint: path relative to graphBaseUrl, e.g. "/users"
         """
+        if self.dry_run:
+            self.logger.info("[DRY RUN] %s %s -> no network call made", method.upper(), endpoint)
+            return DryRunResponse(method, endpoint, kwargs.get("json"))
+
         url = f"{self.config['graphBaseUrl']}{endpoint}"
         headers = kwargs.pop("headers", {})
         headers["Authorization"] = f"Bearer {self._get_token()}"

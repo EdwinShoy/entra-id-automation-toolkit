@@ -37,9 +37,16 @@ def remove_from_groups(client: GraphClient, upn: str, group_ids: list[str]) -> N
 def main():
     parser = argparse.ArgumentParser(description="Offboard an Entra ID user")
     parser.add_argument("--user-principal-name", required=True)
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Log what would happen without calling Microsoft Graph or writing any changes",
+    )
     args = parser.parse_args()
 
-    client = GraphClient()
+    client = GraphClient(dry_run=args.dry_run)
+    if args.dry_run:
+        client.logger.info("Running in --dry-run mode — no changes will be made")
     upn = args.user_principal_name
 
     disable_user(client, upn)

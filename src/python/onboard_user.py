@@ -48,9 +48,16 @@ def main():
     parser.add_argument("--user-principal-name", required=True)
     parser.add_argument("--display-name", required=True)
     parser.add_argument("--department", required=True)
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Log what would happen without calling Microsoft Graph or writing any changes",
+    )
     args = parser.parse_args()
 
-    client = GraphClient()
+    client = GraphClient(dry_run=args.dry_run)
+    if args.dry_run:
+        client.logger.info("Running in --dry-run mode — no changes will be made")
 
     group_ids = client.config.get("defaultGroups", {}).get(args.department, [])
     if not group_ids:

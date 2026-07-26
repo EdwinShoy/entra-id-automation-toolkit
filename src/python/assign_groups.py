@@ -39,9 +39,16 @@ def main():
     parser = argparse.ArgumentParser(description="Sync group membership for an Entra ID user")
     parser.add_argument("--user-principal-name", required=True)
     parser.add_argument("--department", required=True)
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Log what would happen without calling Microsoft Graph or writing any changes",
+    )
     args = parser.parse_args()
 
-    client = GraphClient()
+    client = GraphClient(dry_run=args.dry_run)
+    if args.dry_run:
+        client.logger.info("Running in --dry-run mode — no changes will be made")
     upn = args.user_principal_name
 
     user_resp = client.request("GET", f"/users/{upn}")
