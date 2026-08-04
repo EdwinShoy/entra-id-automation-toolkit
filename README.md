@@ -69,5 +69,4 @@ python src/python/onboard_user.py --user-principal-name jdoe@contoso.onmicrosoft
 
 ## Status
 
-Scaffold only — implementation in progress as part of the IAM Developer roadmap
-(weeks 11-14: build; weeks 15-16: polish + SC-300).
+Scaffold only — implementation in progress.
